@@ -4,13 +4,11 @@ from selenium.webdriver.support import expected_conditions as EC
 
 from create_driver import create_driver
 
-TIMELAPS = 1
-MAX_TIME = 5
-MAX_PARTS = 9
-
-characters_parts = dict()
+from constanst import MAX_PARTS, MAX_TIME
+from character import create_characters
 
 def search_character_link(driver):
+    characters_parts = dict()
     try:
         for number in range(1,MAX_PARTS + 1):
             url = f'https://jojowiki.com/Category:Part_{number}_Characters'
@@ -31,13 +29,16 @@ def search_character_link(driver):
                 name = character.find_element(By.TAG_NAME, 'span').text
                 if name:
                     urls.append(url)
-                    print(name, url)
+                    # print(name, url, number)
             characters_parts[f'{number}'] = urls
+            print(f'< Part {number} >')
     except:
         print('Algo salio mal')
+    return characters_parts
 
 if __name__ == '__main__':
 
     driver = create_driver()
-    search_character_link(driver)
-    print('Hola nmms')
+    characters = search_character_link(driver)
+    create_characters(driver, characters)
+    driver.quit()
