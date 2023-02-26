@@ -4,7 +4,7 @@ from selenium.webdriver.support import expected_conditions as EC
 
 import pandas as pd
 
-from constanst import FOLDER_NAME, Character
+from constanst import FOLDER_NAME, Character, Images
 
 characters = {    
     'name': list(),
@@ -58,7 +58,7 @@ def get_character(driver):
         char.alther_name = None
     # Set Stand
     try:
-        char.stand = card.find_element(By.CSS_SELECTOR, 'div[data-source="stand"]')\
+        char.stands = card.find_element(By.CSS_SELECTOR, 'div[data-source="stand"]')\
             .find_element(By.TAG_NAME, 'a')\
             .get_attribute('href')
         char.is_stand_user = True
@@ -79,32 +79,34 @@ def get_character(driver):
     except:
         char.living = True
 
-    # <-- Get Half Image -->
-    images = card.find_element(By.CSS_SELECTOR, 'div[data-source="image"]')
-    try:
-        images_half = images\
-            .find_elements(By.CLASS_NAME, 'tabber__panel')
+    images = Images
 
-        image_set = images_half.find_element(By.TAG_NAME, 'img')
+    # <-- Get Half Image -->
+    images_container = card.find_element(By.CSS_SELECTOR, 'div[data-source="image"]')
+    try:
+        images_half = images_container\
+            .find_elements(By.CSS_SELECTOR, '.tabber__panel')
+
+        image_url = images_half[0].find_element(By.TAG_NAME, 'img').get_attribute('src')
 
         for img in images_half:
             if img.get_attribute('data-title') == 'Anime':
-                image_set = img.find_element(By.TAG_NAME, 'img')
+                image_url = img.find_element(By.TAG_NAME, 'img').get_attribute('src')
+                break
 
-        char.images.half_body = image_set.get_attribute('src')
+        images.half_body = image_url
     except:
-        images_half = card.find_element(By.CSS_SELECTOR, 'a.image')
         # <-- Set Image -->
-        char.images.half_body = images_half.find_element(By.TAG_NAME, 'img').get_attribute('src')
-        
-    # <-- Get Full Image -->
-    try:
-        images = card.find_element(By.CSS_SELECTOR, 'div[data-source="image"]')\
-            .find_element(By.CLASS_NAME, 'tabber__section')\
-            .find_elements(By.CLASS_NAME, 'tabber__panel')
-    except:
-        images = card.find_element(By.CSS_SELECTOR, 'div[data-source="image"]')\
-            .find_elements(By.CSS_SELECTOR, 'a.image')
+        images.half_body = images.find_element(By.CSS_SELECTOR, 'a.image img').get_attribute('src')
+    char.images = images
+    # # <-- Get Full Image -->
+    # try:
+    #     images = card.find_element(By.CSS_SELECTOR, 'div[data-source="image"]')\
+    #         .find_element(By.CLASS_NAME, 'tabber__section')\
+    #         .find_elements(By.CLASS_NAME, 'tabber__panel')
+    # except:
+    #     images = card.find_element(By.CSS_SELECTOR, 'div[data-source="image"]')\
+    #         .find_elements(By.CSS_SELECTOR, 'a.image')
 
     # <-- Set part -->
     char.is_hamon_user = False
@@ -140,34 +142,29 @@ def append_obj(obj:Character):
     characters['is_gyro_user'].append(obj.is_gyro_user)
     characters['living'].append(obj.living)
     characters['is_human'].append(obj.is_human)
-    characters['images'].append(obj.image)
+    characters['images'].append(obj.images)
     characters['stands'].append(obj.stand)
     characters['url'].append(obj.url)
 
 
 def create_characters(driver, urls):
     error_urls = list()
-    try:
-        for number, list_urls in urls.items():
-            number = 1
-            for url in list_urls:
-                driver.get(url)
-                try:
-                    char = get_character(driver)
-                    char.parts = number
-                    char.url = url
-                    append_obj(char)
-                    print(char)
-                    if number >= 3:
-                        break
-                    number = number + 1
-                except:
-                    error_urls.append(url)
-                    print('<-- Error -->')
-                    continue
-    except:
-        print('<-- salio algo mal -->')
-        print(f'<-- {error_urls} -->')
+    for number, list_urls in urls.items():
+        number = 1
+        for url in list_urls:
+            driver.get(url)
+            try:
+                char = get_character(driver)
+                char.parts = number
+                char.url = url
+                append_obj(char)
+                if number >= 3:
+                    break
+                number = number + 1
+            except:
+                error_urls.append(url)
+                print('<-- Error -->')
+                continue
     create_csv(characters)
     if len(error_urls):
         print('<-- Urls con errores -->')

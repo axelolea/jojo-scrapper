@@ -1,7 +1,16 @@
 FOLDER_NAME = './files/bs/'
 
+# <-- Time Values -->
+
 MAX_TIME = 10
+
+
+# <-- Search Values -->
 MAX_PARTS = 2
+DOMAIN = 'https://jojowiki.com'
+
+
+# <-- Class -->
 
 class Images:
     full_body:str
@@ -22,5 +31,7 @@ class Character:
     images:Images
     stands:list
     url:str
+    def __init__(self) -> None:
+        self.images = Images()
     def __repr__(self) -> str:
-        return f'< {self.name} - {self.url} >'
+        return f'<< {self.name} / {self.url} >>'
