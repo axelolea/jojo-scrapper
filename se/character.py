@@ -97,7 +97,7 @@ def get_character(driver):
         images.half_body = image_url
     except:
         # <-- Set Image -->
-        images.half_body = images.find_element(By.CSS_SELECTOR, 'a.image img').get_attribute('src')
+        images.half_body = images_container.find_element(By.CSS_SELECTOR, 'a.image img').get_attribute('src')
     char.images = images
     # # <-- Get Full Image -->
     # try:
