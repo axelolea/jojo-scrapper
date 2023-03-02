@@ -1,3 +1,4 @@
+from os import cpu_count
 FOLDER_NAME = './files/bs/'
 
 # <-- Time Values -->
@@ -6,10 +7,11 @@ MAX_TIME = 10
 
 
 # <-- Search Values -->
-MAX_PARTS = 3
+MAX_PARTS = 2
 DOMAIN = 'https://jojowiki.com'
 
 N_THREADS = 10
+N_PROCESSES = cpu_count()
 
 # <-- Class -->
 
@@ -18,8 +20,8 @@ class Images:
     half_body:str
     def __repr__(self) -> str:
         if self.full_body:
-            return f'<< Class Image with Full Body >>'
-        return f'<< Class Image without Full Body >>'
+            return f'<< Half Body / Full Body >>'
+        return f'<< Half Body >>'
 
 class Character:
     name:str
