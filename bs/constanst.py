@@ -1,10 +1,10 @@
-from os import cpu_count
+# Directory values
+
 FOLDER_NAME = './files/bs/'
 
 # <-- Time Values -->
 
 MAX_TIME = 10
-
 
 # <-- Search Values -->
 MAX_PARTS = 1
@@ -13,8 +13,15 @@ DOMAIN = 'https://jojowiki.com'
 RIPPLE_LINK = DOMAIN + '/Category:Ripple_Users'
 SPIN_LINK = DOMAIN + '/Category:Spin_Users'
 
-N_THREADS = 10
-N_PROCESSES = cpu_count()
+MOSAIC_CHARACTERS = [
+    f'{DOMAIN}/Category:Part_{i}_Characters'
+    for i in range(1, MAX_PARTS + 1)
+]
+
+# GET_MOSAIC_STANDS = [
+#     f'{DOMAIN}/Category:Part_{i}_Characters'
+#     for i in range(1, MAX_PARTS + 1)
+# ]
 
 # <-- Class -->
 

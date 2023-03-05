@@ -127,7 +127,7 @@ def get_character_data(obj: dict) -> Character:
         print(char)
         return char
     except:
-        return
+        return obj['page']
 
 
 # <-- Create data files -->

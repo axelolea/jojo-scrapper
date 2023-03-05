@@ -1,4 +1,4 @@
-from constanst import DOMAIN, MAX_PARTS
+from constanst import DOMAIN, MAX_PARTS, MOSAIC_CHARACTERS
 from concurrent.futures import ThreadPoolExecutor
 
 characters = list()
@@ -7,11 +7,10 @@ error_characters = list()
 from get_data import fetch, get_character_data, create_files
 
 def run():
-    parts_pages = [f'{DOMAIN}/Category:Part_{i}_Characters' for i in range(1, MAX_PARTS + 1)]
 
     characters_obj = list()
     # <-- Get all characters pages -->
-    for number, page in enumerate(parts_pages, start=1):
+    for number, page in enumerate(MOSAIC_CHARACTERS, start=1):
         soup = fetch(page)
         character_tags = soup.select_one('div.diamond2')\
                             .select('div.charname a')
