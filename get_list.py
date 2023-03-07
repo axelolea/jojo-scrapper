@@ -2,7 +2,7 @@ from constanst import DOMAIN, MAX_PARTS
 from get_data import fetch
 
 
-def remove_repeat(list_items:list) -> list:
+def remove_repeat(list_items: list) -> list:
     duplicated_pages = set()
 
     for index, item in enumerate(list_items):
@@ -11,10 +11,10 @@ def remove_repeat(list_items:list) -> list:
             continue
 
         start_index = index + 1
-        comp_list = list_items[start_index : len(list_items)]
+        comp_list = list_items[start_index: len(list_items)]
         # Create comparative list 
-        
-        for comp_index, comp in enumerate(comp_list, start = start_index):
+
+        for comp_index, comp in enumerate(comp_list, start=start_index):
             if item['url'] == comp['url']:
                 list_items[index]['parts'].extend(list_items[comp_index]['parts'])
                 duplicated_pages.add(comp_index)
@@ -22,7 +22,6 @@ def remove_repeat(list_items:list) -> list:
 
 
 def get_characters_list() -> list:
-
     characters_obj = list()
 
     mosaic_characters = [
@@ -32,23 +31,19 @@ def get_characters_list() -> list:
 
     # <-- Get all characters pages -->
     for number, page in enumerate(mosaic_characters, start=1):
-
         soup = fetch(page)
-        character_tags = soup.select_one('div.diamond2')\
-                            .select('div.charname a')
+        character_tags = soup.select_one('div.diamond2') \
+            .select('div.charname a')
         actual_length = len(characters_obj) + 1
 
         characters_obj.extend(
             [
                 {
                     'url': DOMAIN + tag.attrs["href"],
-                    'parts': [number,],
+                    'parts': [number, ],
                     'id': index
-                } 
-                for index, tag in enumerate(
-                    character_tags,
-                    start = actual_length
-                )
+                }
+                for index, tag in enumerate(character_tags, start=actual_length)
             ]
         )
 
@@ -57,29 +52,22 @@ def get_characters_list() -> list:
 
 
 def get_stands_list() -> list:
-
     stands_obj = list()
     soup = fetch(f'{DOMAIN}/List_of_Stands')
     stands_tags = soup.select('div.diamond2')
-                        # .select('div.charname a')
-
 
     # <-- Get all characters pages -->
     for number, block in enumerate(stands_tags[:MAX_PARTS - 2], start=3):
-
         stands = block.select('div.charname a')
         actual_length = len(stands_obj) + 1
         stands_obj.extend(
             [
                 {
                     'url': DOMAIN + tag.attrs["href"],
-                    'parts': [number,],
+                    'parts': [number, ],
                     'id': index
-                } 
-                for index, tag in enumerate(
-                    stands,
-                    start = actual_length
-                )
+                }
+                for index, tag in enumerate(stands, start=actual_length)
             ]
         )
     # <-- Delete all duplicate pages -->
@@ -87,16 +75,5 @@ def get_stands_list() -> list:
     return remove_repeat(stands_obj)
 
 
-from constanst import Character, Stand
-
-def clean_characters_list(char_list:list):
-
-    characters = list()
-    errors = list()
-    for item in char_list:
-        if isinstance(item, Character) or isinstance(item, Stand):
-            characters.append(item)
-        else:
-            errors.append(item)
-    characters_sorted = sorted(characters, key = lambda char : char.id)
-    return characters_sorted, errors
+def clean_list(items_list: list) -> list:
+    return sorted(items_list, key=lambda item: item.id)
