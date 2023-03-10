@@ -1,5 +1,5 @@
 from constanst import DOMAIN, MAX_PARTS
-from get_data import fetch
+from get_data_characters import fetch
 
 
 def remove_repeat(list_items: list) -> list:
@@ -77,3 +77,19 @@ def get_stands_list() -> list:
 
 def clean_list(items_list: list) -> list:
     return sorted(items_list, key=lambda item: item.id)
+
+
+from constanst import Character, Stand, FOLDER_NAME
+import os
+import json
+import pandas as pd
+
+
+def create_files(items_list: list[Character|Stand], filename: str):
+    if not os.path.exists(FOLDER_NAME):
+        os.makedirs(FOLDER_NAME)
+    df = pd.DataFrame([item.__dict__ for item in items_list])
+    parsed = json.loads(df.to_json(orient="records"))
+    with open(FOLDER_NAME + f'{filename}.json', "w") as f:
+        f.write(json.dumps(parsed, indent=2))
+    print(df)

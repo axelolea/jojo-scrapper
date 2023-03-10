@@ -4,7 +4,7 @@ from get_list import (
     clean_list,
     get_stands_list
 )
-from get_data import (
+from get_data_characters import (
     get_character_data,
     get_stand_data,
     create_files
