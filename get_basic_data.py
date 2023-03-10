@@ -31,6 +31,7 @@ def get_basic_data(
             if img.attrs['data-title'] == 'Anime':
                 image_url = img.find('img').attrs['src']
                 break
+
     finally:
         obj.half_body = image_url
     full_image = soup.select_one('div.floatleft')
