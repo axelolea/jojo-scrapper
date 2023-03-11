@@ -1,31 +1,3 @@
-from bs4 import BeautifulSoup
-from requests import Session
-
-session = Session()
-
-
-# <-- Functions -->
-
-def fetch(url: str) -> BeautifulSoup:
-    resp = session.get(url)
-    content = resp.content
-    return BeautifulSoup(content, 'html.parser')
-
-
-# <-- Directory values -->
-
-FOLDER_NAME = './files/'
-
-# <-- Search Values -->
-
-MAX_PARTS = 3
-DOMAIN = 'https://jojowiki.com'
-
-STATS_VALUES = ('NULL', 'A', 'B', 'C', 'D', 'E', 'INFINITE', '?')
-
-
-# <-- Class -->
-
 class Images:
     # <-- Values -->
     full_body: str
@@ -33,7 +5,7 @@ class Images:
 
     def __repr__(self) -> str:
         if self.full_body and self.half_body:
-            return f'<< Half Body / Full Body >>'
+            return f'<< Half / Full Body >>'
         elif self.half_body:
             return f'<< Half Body >>'
         else:
@@ -48,6 +20,7 @@ class Stats:
     durability: str
     precision: str
     potential: str
+    stats_values: ('NULL', 'A', 'B', 'C', 'D', 'E', 'INFINITE', '?')
 
     def __repr__(self) -> str:
         return f'<< {self.power}/{self.speed}/{self.range}/{self.durability}/{self.precision}/{self.potential} >>'
@@ -77,6 +50,9 @@ class Character:
 
     def __repr__(self) -> str:
         return f'Character(<< {self.id}.- Name <str> at {self.name}, Url <str> at {self.url}>>)'
+
+    def __eq__(self, other):
+        return
 
 
 class Stand:

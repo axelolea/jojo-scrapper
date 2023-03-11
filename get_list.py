@@ -1,91 +1,50 @@
-from constanst import DOMAIN, MAX_PARTS
-from get_data_characters import fetch
-
-
-def remove_repeat(list_items: list) -> list:
-    duplicated_pages = set()
-
-    for index, item in enumerate(list_items):
-
-        if index in duplicated_pages:
-            continue
-
-        start_index = index + 1
-        comp_list = list_items[start_index: len(list_items)]
-        # Create comparative list 
-
-        for comp_index, comp in enumerate(comp_list, start=start_index):
-            if item['url'] == comp['url']:
-                list_items[index]['parts'].extend(list_items[comp_index]['parts'])
-                duplicated_pages.add(comp_index)
-    return [item for index, item in enumerate(list_items) if index not in duplicated_pages]
-
-
-def get_characters_list() -> list:
-    characters_obj = list()
-
-    mosaic_characters = [
-        f'{DOMAIN}/Category:Part_{i}_Characters'
-        for i in range(1, MAX_PARTS + 1)
-    ]
-
-    # <-- Get all characters pages -->
-    for number, page in enumerate(mosaic_characters, start=1):
-        soup = fetch(page)
-        character_tags = soup.select_one('div.diamond2') \
-            .select('div.charname a')
-        actual_length = len(characters_obj) + 1
-
-        characters_obj.extend(
-            [
-                {
-                    'url': DOMAIN + tag.attrs["href"],
-                    'parts': [number, ],
-                    'id': index
-                }
-                for index, tag in enumerate(character_tags, start=actual_length)
-            ]
-        )
-
-    # <-- Delete all duplicate pages -->
-    return remove_repeat(characters_obj)
-
-
-def get_stands_list() -> list:
-    stands_obj = list()
-    soup = fetch(f'{DOMAIN}/List_of_Stands')
-    stands_tags = soup.select('div.diamond2')
-
-    # <-- Get all characters pages -->
-    for number, block in enumerate(stands_tags[:MAX_PARTS - 2], start=3):
-        stands = block.select('div.charname a')
-        actual_length = len(stands_obj) + 1
-        stands_obj.extend(
-            [
-                {
-                    'url': DOMAIN + tag.attrs["href"],
-                    'parts': [number, ],
-                    'id': index
-                }
-                for index, tag in enumerate(stands, start=actual_length)
-            ]
-        )
-    # <-- Delete all duplicate pages -->
-
-    return remove_repeat(stands_obj)
-
-
-def clean_list(items_list: list) -> list:
-    return sorted(items_list, key=lambda item: item.id)
-
-
-from constanst import Character, Stand, FOLDER_NAME
+from get_data.characters import fetch
+from constants.constants import DOMAIN, MAX_PARTS, FOLDER_NAME
+from constants.models import Character, Stand
 import os
 import json
 import pandas as pd
 
+TABLE_CHARACTERS_PAGES = [
+    f'{DOMAIN}/Category:Part_{num}_Characters'
+    for num in range(1, MAX_PARTS + 1)
+]
 
-def create_files(items_list: list[Character|Stand], filename: str):
+
+def get_characters_pages() -> set:
+
+    characters_set = set()
+
+    # <-- Get all characters pages -->
+    for page in TABLE_CHARACTERS_PAGES:
+        soup = fetch(page)
+        character_tags = soup.select_one('div.diamond2').select('div.charname a')
+        for tag in character_tags:
+            char_url = f'{DOMAIN}{tag.attrs["href"]}'
+            characters_set.add(char_url)
+
+    return characters_set
+
+
+def get_stands_pages() -> set:
+    stands_list = set()
+    soup = fetch(f'{DOMAIN}/List_of_Stands')
+    table_stands_pages = soup.select('div.diamond2')
+
+    # <-- Get all characters pages -->
+
+    for block in table_stands_pages[:MAX_PARTS - 2]:
+        stands_tags = block.select('div.charname a')
+        for tag in stands_tags:
+            stand_url = f'{DOMAIN}{tag.attrs["href"]}'
+            stands_list.add(stand_url)
+
+    # <-- Delete all duplicate pages -->
+
+    return stands_list
+
+
+def create_files(items_list: list[Character | Stand], filename: str):
     if not os.path.exists(FOLDER_NAME):
         os.makedirs(FOLDER_NAME)
     df = pd.DataFrame([item.__dict__ for item in items_list])

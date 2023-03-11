@@ -1,28 +1,24 @@
 from concurrent.futures import ThreadPoolExecutor
 from get_list import (
-    get_characters_list,
-    clean_list,
-    get_stands_list
+    create_files,
+    get_characters_pages,
+    get_stands_pages
 )
-from get_data_characters import (
-    get_character_data,
-    get_stand_data,
-    create_files
-)
+
+from get_data.stands import get_stand_data
+from get_data.characters import get_character_data
 
 
 def main() -> None:
     # <-- Scrap Characters Data --> 
-    # run(get_characters_list(), get_character_data, 'characters')
+    run(get_characters_pages(), get_character_data, 'characters')
     # <-- Scrap Stands Data -->
-    run(get_stands_list(), get_stand_data, 'stands')
+    # run(get_stands_pages(), get_stand_data, 'stands')
 
 
-def run(urls: list, data_func, filename: str) -> None:
-
+def run(urls: set, data_func, filename: str) -> None:
     with ThreadPoolExecutor() as executor:
         results = executor.map(data_func, urls)
-    # items = clean_list(results)
     create_files(results, filename)
 
 
