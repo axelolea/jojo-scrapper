@@ -8,8 +8,10 @@ class Images:
             return f'<< Half / Full Body >>'
         elif self.half_body:
             return f'<< Half Body >>'
-        else:
-            return f'<< None >>'
+        return f'<< None >>'
+
+    def validated(self):
+        return not self.full_body or self.half_body
 
 
 class Stats:
@@ -20,10 +22,23 @@ class Stats:
     durability: str
     precision: str
     potential: str
-    stats_values: ('NULL', 'A', 'B', 'C', 'D', 'E', 'INFINITE', '?')
 
     def __repr__(self) -> str:
         return f'<< {self.power}/{self.speed}/{self.range}/{self.durability}/{self.precision}/{self.potential} >>'
+
+    def clean_stats(self):
+        pass
+
+    def validated(self) -> bool:
+        values = ('NULL', 'A', 'B', 'C', 'D', 'E', 'INFINITE', '?')
+        return (
+                self.power in values and
+                self.speed in values and
+                self.range in values and
+                self.durability in values and
+                self.precision in values and
+                self.potential in values
+        )
 
 
 class Character:
@@ -49,10 +64,16 @@ class Character:
         self.images = Images()
 
     def __repr__(self) -> str:
-        return f'Character(<< {self.id}.- Name <str> at {self.name}, Url <str> at {self.url}>>)'
+        return f'Character(<< Name <str> at {self.name}, Url <str> at {self.url}>>)'
 
-    def __eq__(self, other):
-        return
+    def validated(self):
+        return (
+                isinstance(self.name, str) and
+                isinstance(self.japanese_name, str) and
+                isinstance(self.parts, list) and
+                isinstance(self.url, str) and
+                self.images.validated()
+        )
 
 
 class Stand:
@@ -73,4 +94,15 @@ class Stand:
         self.stats = Stats()
 
     def __repr__(self) -> str:
-        return f'Stand(<< {self.id}.- Name <str> {self.name}, Url at {self.url} >>)'
+        return f'Stand(<< Name <str> {self.name}, Url at {self.url} >>)'
+
+    def validated(self):
+        return (
+                isinstance(self.name, str) and
+                isinstance(self.japanese_name, str) and
+                isinstance(self.parts, list) and
+                isinstance(self.abilities, str) and
+                isinstance(self.url, str) and
+                self.stats.validated() and
+                self.images.validated()
+        )

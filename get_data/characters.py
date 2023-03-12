@@ -15,12 +15,12 @@ RIPPLE_USERS = get_users_list(DOMAIN + '/Category:Ripple_Users')
 SPIN_USERS = get_users_list(DOMAIN + '/Category:Spin_Users')
 
 
-def get_character_data(url_search: dict) -> Character:
+def get_character_data(url_search: str) -> Character:
     # <-- Create Character Object -->
     char = Character()
-    # <-- Create requests a page -->
+    # <-- Get soup -->
     soup = fetch(url_search)
-    # <-- Create card -->
+    # <-- Get card -->
     card = soup.select_one('aside.portable-infobox')
 
     # <-- Character Basics -->
@@ -71,4 +71,3 @@ def get_character_data(url_search: dict) -> Character:
     # <-- Print Result -->
     print(char)
     return char
-

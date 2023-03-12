@@ -40,6 +40,7 @@ def get_stand_data(url_search: str) -> Stand:
     stand.stats.precision = card.select_one('td[data-source="precision"]').text
     stand.stats.potential = card.select_one('td[data-source="potential"]').text
 
+    stand.stats.clean_stats()
     # <-- Print Result -->
     print(stand)
     return stand

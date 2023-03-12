@@ -1,5 +1,6 @@
 from constants.models import Character, Stand
 from bs4 import BeautifulSoup
+import re
 
 
 def get_basic_data(
@@ -7,12 +8,18 @@ def get_basic_data(
         soup: BeautifulSoup,
         card: BeautifulSoup
 ) -> Character | Stand:
-
-    # <-- Character Name -->
+    # <-- Object Name -->
     obj.name = card.select_one('[data-source="title"]').string
 
-    # <-- Character Japanese Name -->
+    # <-- Object Japanese Name -->
     obj.japanese_name = card.select_one('[lang=ja]').text
+
+    # <-- Object Parts -->
+    urls_list = [
+        url.attrs['href']
+        for url in soup.select('div#catlinks a')
+    ]
+    obj.parts = get_parts(urls_list)
 
     # <-- Half Body -->
     if images_half := card.select('div[data-source="image"] .tabber__panel'):
@@ -25,27 +32,24 @@ def get_basic_data(
         obj.images.half_body = None
 
     # <-- Full Body -->
-    if images_full := soup.select('.mw-header + div.floatleft'):
-        pass
-    elif images_full := soup.select('div.tbox img'):
-        pass
+    if images_full := soup.select('div.tbox img'):
+        obj.images.full_body = images_full[-1].attrs['src']
+    elif images_full := soup.select_one('.mw-header + div.floatleft img'):
+        obj.images.full_body = images_full.attrs['src']
     else:
         obj.images.full_body = None
-
-    # image_url = images_full[0].find('img').attrs['src']
-    # for img in images_container:
-    #     if img.attrs['data-title'] == 'Anime':
-    #         image_url = img.find('img').attrs['src']
-    #         break
-    # obj.half_body = image_url
-    # try:
-    #     obj.full_body = soup.select_one('div.floatleft') \
-    #         .find('img').attrs['src']
 
     return obj
 
 
-def get_parts(soup: BeautifulSoup) -> list:
-    parts_list = list()
-    parts = soup.select('div#catlinks a')
-    return parts_list
+def get_parts(
+        urls: list
+) -> list:
+
+    return [
+        int(
+            re.search(r'\d', url).group()
+        )
+        for url in urls
+        if re.search(r'/Category:Part_\d_Characters', url)
+    ]

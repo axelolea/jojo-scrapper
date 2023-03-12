@@ -13,7 +13,7 @@ def main() -> None:
     # <-- Scrap Characters Data --> 
     run(get_characters_pages(), get_character_data, 'characters')
     # <-- Scrap Stands Data -->
-    # run(get_stands_pages(), get_stand_data, 'stands')
+    run(get_stands_pages(), get_stand_data, 'stands')
 
 
 def run(urls: set, data_func, filename: str) -> None:

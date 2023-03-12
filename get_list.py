@@ -1,22 +1,23 @@
 from get_data.characters import fetch
 from constants.constants import DOMAIN, MAX_PARTS, FOLDER_NAME
-from constants.models import Character, Stand
+# from constants.models import Character, Stand
 import os
 import json
 import pandas as pd
-
-TABLE_CHARACTERS_PAGES = [
-    f'{DOMAIN}/Category:Part_{num}_Characters'
-    for num in range(1, MAX_PARTS + 1)
-]
 
 
 def get_characters_pages() -> set:
 
     characters_set = set()
 
+    # <-- Characters Pages -->
+    table_characters_pages = [
+        f'{DOMAIN}/Category:Part_{num}_Characters'
+        for num in range(1, MAX_PARTS + 1)
+    ]
+
     # <-- Get all characters pages -->
-    for page in TABLE_CHARACTERS_PAGES:
+    for page in table_characters_pages:
         soup = fetch(page)
         character_tags = soup.select_one('div.diamond2').select('div.charname a')
         for tag in character_tags:
@@ -44,10 +45,10 @@ def get_stands_pages() -> set:
     return stands_list
 
 
-def create_files(items_list: list[Character | Stand], filename: str):
+def create_files(items_list, filename: str):
     if not os.path.exists(FOLDER_NAME):
         os.makedirs(FOLDER_NAME)
-    df = pd.DataFrame([item.__dict__ for item in items_list])
+    df = pd.DataFrame([item.__dict__ for item in items_list if item.validated()])
     parsed = json.loads(df.to_json(orient="records"))
     with open(FOLDER_NAME + f'{filename}.json', "w") as f:
         f.write(json.dumps(parsed, indent=2))
