@@ -14,6 +14,22 @@ class Images:
         return not self.full_body or self.half_body
 
 
+class BasicData:
+    id: int
+    name: str
+    japanese_name: str
+    parts: str
+    alter_name: str
+    images: Images
+    url: str
+    last_update: float
+
+    def __init__(self, **kwargs):
+        if kwargs.get('images'):
+            self.images = Images()
+        self.__dict__.update(**kwargs)
+
+
 class Stats:
     # <-- Values -->
     power: str
@@ -24,10 +40,8 @@ class Stats:
     potential: str
 
     def __repr__(self) -> str:
-        return f'<< {self.power}/{self.speed}/{self.range}/{self.durability}/{self.precision}/{self.potential} >>'
-
-    def clean_stats(self):
-        pass
+        return f'<< {self.power}/{self.speed}/{self.range}/' \
+               f'{self.durability}/{self.precision}/{self.potential} >>'
 
     def validated(self) -> bool:
         values = ('NULL', 'A', 'B', 'C', 'D', 'E', 'INFINITE', '?')
@@ -41,14 +55,9 @@ class Stats:
         )
 
 
-class Character:
+class Character(BasicData):
     # <-- Values -->
 
-    id: int
-    name: str
-    japanese_name: str
-    parts: str
-    alter_name: str
     catchphrase: str
     country: str
     is_ripple_user: bool
@@ -56,12 +65,10 @@ class Character:
     is_spin_user: bool
     living: bool
     is_human: bool
-    images: Images
     stands: list
-    url: str
 
-    def __init__(self) -> None:
-        self.images = Images()
+    def __init__(self, **kwargs) -> None:
+        super().__init__(**kwargs)
 
     def __repr__(self) -> str:
         return f'Character(<< Name <str> at {self.name}, Url <str> at {self.url}>>)'
@@ -76,21 +83,15 @@ class Character:
         )
 
 
-class Stand:
+class Stand(BasicData):
     # <-- Values -->
-    id: int
-    name: str
-    japanese_name: str
-    parts: list
     alter_name: str
     abilities: str
     battle_cry: str
-    images: Images
     stats: Stats
-    url: str
 
-    def __init__(self) -> None:
-        self.images = Images()
+    def __init__(self, **kwargs) -> None:
+        super().__init__(**kwargs)
         self.stats = Stats()
 
     def __repr__(self) -> str:
@@ -103,6 +104,6 @@ class Stand:
                 isinstance(self.parts, list) and
                 isinstance(self.abilities, str) and
                 isinstance(self.url, str) and
-                self.stats.validated() and
-                self.images.validated()
+                self.images.validated() and
+                self.stats.validated()
         )
