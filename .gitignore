@@ -1,8 +1,9 @@
-/driver/
-/venv/
+driver/
+venv/
 data.csv
 models.txt
-/files/
+files/
 __pycache__/
-/test/
-/se/
+test/
+se/
+.idea/
