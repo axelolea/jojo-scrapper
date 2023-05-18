@@ -1,13 +1,16 @@
 import re
-from constants.constants import fetch, DOMAIN
+from constants.constants import DOMAIN
 from constants.models import Character
+from scrapper import get_scrapper
 
 from get_data.basic_data import get_basic_data
+
+scrapper = get_scrapper()
 
 
 def get_users_list(url: str) -> list:
     # Create requests a page
-    soup = fetch(url)
+    soup = scrapper.fetch(url)
     return [DOMAIN + item.attrs["href"] for item in soup.select('div#mw-pages a')]
 
 
@@ -16,19 +19,19 @@ SPIN_USERS = get_users_list(DOMAIN + '/Category:Spin_Users')
 
 
 def get_character_data(url_search: str) -> Character:
-    # <-- Create Character Object -->
-    char = Character()
     # <-- Get soup -->
-    soup = fetch(url_search)
+    soup = scrapper.fetch(url_search)
     # <-- Get card -->
     card = soup.select_one('aside.portable-infobox')
 
     # <-- Character Basics -->
-    get_basic_data(
-        char,
+    basic_data = get_basic_data(
         soup,
         card
     )
+
+    # <-- Create Character Object -->
+    char = Character(**basic_data)
 
     char.url = url_search
 

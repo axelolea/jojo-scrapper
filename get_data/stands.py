@@ -1,21 +1,24 @@
-from constants.constants import fetch
 from constants.models import Stand
 from get_data.basic_data import get_basic_data
+from scrapper import get_scrapper
+import re
+
+scrapper = get_scrapper()
 
 
 def get_stand_data(url_search: str) -> Stand:
-    # <-- Create Stand Object -->
-    stand = Stand()
     # <-- Create requests a page -->
-    soup = fetch(url_search)
+    soup = scrapper.fetch(url_search)
     # <-- Create card -->
     card = soup.select_one('aside.portable-infobox')
 
-    get_basic_data(
-        stand,
+    basic_data = get_basic_data(
         soup,
         card
     )
+
+    # <-- Create Stand Object -->
+    stand = Stand(**basic_data)
 
     stand.url = url_search
 
@@ -33,15 +36,24 @@ def get_stand_data(url_search: str) -> Stand:
     abilities = soup.select('[href="#Abilities"] + ul span[class="toctext"]')
     stand.abilities = ', '.join([item.text for item in abilities])
 
-    stand.stats.power = card.select_one('td[data-source="destpower"]').text
-    stand.stats.speed = card.select_one('td[data-source="speed"]').text
-    stand.stats.range = card.select_one('td[data-source="range"]').text
-    stand.stats.durability = card.select_one('td[data-source="stamina"]').text
-    stand.stats.precision = card.select_one('td[data-source="precision"]').text
-    stand.stats.potential = card.select_one('td[data-source="potential"]').text
+    # <-- Stand Stats -->
 
-    stand.stats.clean_stats()
+    stand.stats = {}
+    regex = r'Null|A|B|C|D|E|\∞|\?'
+
+    for stat in [
+        'destpower',
+        'speed',
+        'range',
+        'stamina',
+        'precision',
+        'potential'
+    ]:
+        if stat_value := card.select_one(f'td[data-source="{stat}"]'):
+            stand.stats[stat] = re.search(regex, stat_value.text).group()
+        else:
+            stand.stats[stat] = '?'
+
     # <-- Print Result -->
-    print(stand)
+    # print(stand)
     return stand
-
