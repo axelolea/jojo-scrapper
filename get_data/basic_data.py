@@ -21,8 +21,10 @@ def get_basic_data(
         url.attrs['href']
         for url in soup.select('div#catlinks a')
     ]
+
     basic_data['parts'] = get_parts(urls_list)
 
+    # <-- Images Dict -->
     basic_data['images'] = dict()
 
     # <-- Half Body -->
@@ -33,7 +35,8 @@ def get_basic_data(
                 basic_data['images']['half_body'] = img.find('img').attrs['src']
                 break
     else:
-        basic_data['images']['half_body'] = None
+        images_half = card.select_one('div[data-source="image"] img')
+        basic_data['images']['half_body'] = images_half.attrs['src']
 
     # <-- Full Body -->
     if images_full := soup.select('div.tbox img'):
