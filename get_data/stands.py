@@ -1,21 +1,26 @@
 from constants.models import Stand
 from get_data.basic_data import get_basic_data
+from constants.constants import STATS_DATA_SOURCE, STATS_REGEX
 from scrapper import get_scrapper
+
 import re
 
 scrapper = get_scrapper()
 
 
-def get_stand_data(url_search: str) -> Stand:
+def get_stand_data(url_search: str) -> Stand | None:
     # <-- Create requests a page -->
     soup = scrapper.fetch(url_search)
     # <-- Create card -->
     card = soup.select_one('aside.portable-infobox')
 
-    basic_data = get_basic_data(
-        soup,
-        card
-    )
+    try:
+        basic_data = get_basic_data(
+            soup,
+            card
+        )
+    except:
+        return None
 
     # <-- Create Stand Object -->
     stand = Stand(**basic_data)
@@ -25,8 +30,11 @@ def get_stand_data(url_search: str) -> Stand:
     # <-- Stand Battle-cry -->
 
     stand_cry = card.select_one('[data-source="cry"] div')
-    stand.battle_cry = stand_cry.contents if stand_cry else None
-
+    cry_strings = stand_cry.contents if stand_cry else None
+    if stand_cry:
+        stand.battle_cry = ' '.join([cry for cry in cry_strings if isinstance(cry, str)])
+    else:
+        stand.battle_cry = None
     # <-- Stand Alias -->
 
     alias_items = card.select('div[data-source="engname"] div')
@@ -38,21 +46,15 @@ def get_stand_data(url_search: str) -> Stand:
 
     # <-- Stand Stats -->
 
-    stand.stats = {}
-    regex = r'Null|A|B|C|D|E|\∞|\?'
+    stats = {}
 
-    for stat in [
-        'destpower',
-        'speed',
-        'range',
-        'stamina',
-        'precision',
-        'potential'
-    ]:
+    for stat in STATS_DATA_SOURCE:
         if stat_value := card.select_one(f'td[data-source="{stat}"]'):
-            stand.stats[stat] = re.search(regex, stat_value.text).group()
+            stats[stat] = re.search(STATS_REGEX, stat_value.text).group()
         else:
-            stand.stats[stat] = '?'
+            stats[stat] = '?'
+
+    stand.stats.__dict__.update(**stats)
 
     # <-- Print Result -->
     # print(stand)

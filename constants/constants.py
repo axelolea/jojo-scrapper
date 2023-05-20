@@ -2,7 +2,7 @@
 FOLDER_NAME = './files/'
 
 # <-- Search Values -->
-MAX_PARTS = 1
+MAX_PARTS = 9
 DOMAIN = 'https://jojowiki.com'
 
 months = {
@@ -20,3 +20,13 @@ months = {
     'December': 12,
 }
 
+STATS_REGEX = r'Null|A|B|C|D|E|\∞|\?'
+
+STATS_DATA_SOURCE = [
+    'destpower',
+    'speed',
+    'range',
+    'stamina',
+    'precision',
+    'potential'
+]
