@@ -5,13 +5,13 @@ from functools import lru_cache
 
 # <-- Functions -->
 class Scrapper:
-    session: Session
+    _session: Session
 
     def __init__(self):
-        self.session = Session()
+        self._session = Session()
 
     def fetch(self, url: str) -> BeautifulSoup:
-        resp = self.session.get(url)
+        resp = self._session.get(url)
         content = resp.content
         return BeautifulSoup(content, 'html.parser')
 
