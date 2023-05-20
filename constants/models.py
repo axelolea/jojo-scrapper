@@ -3,6 +3,9 @@ class Images:
     full_body: str
     half_body: str
 
+    def __init__(self, **kwargs):
+        self.__dict__.update(**kwargs)
+
     def __repr__(self) -> str:
         if self.full_body and self.half_body:
             return f'<< Half / Full Body >>'
@@ -25,31 +28,31 @@ class BasicData:
     last_update: float
 
     def __init__(self, **kwargs):
-        if kwargs.get('images'):
-            self.images = Images()
         self.__dict__.update(**kwargs)
+        if images := kwargs.get('images'):
+            self.images = Images(**images)
 
 
 class Stats:
     # <-- Values -->
-    power: str
+    destpower: str
     speed: str
     range: str
-    durability: str
+    stamina: str
     precision: str
     potential: str
 
     def __repr__(self) -> str:
-        return f'<< {self.power}/{self.speed}/{self.range}/' \
-               f'{self.durability}/{self.precision}/{self.potential} >>'
+        return f'<< {self.destpower}/{self.speed}/{self.range}/' \
+               f'{self.stamina}/{self.precision}/{self.potential} >>'
 
     def validated(self) -> bool:
         values = ('NULL', 'A', 'B', 'C', 'D', 'E', 'INFINITE', '?')
         return (
-                self.power in values and
+                self.destpower in values and
                 self.speed in values and
                 self.range in values and
-                self.durability in values and
+                self.stamina in values and
                 self.precision in values and
                 self.potential in values
         )
@@ -95,7 +98,7 @@ class Stand(BasicData):
         self.stats = Stats()
 
     def __repr__(self) -> str:
-        return f'Stand(<< Name <str> {self.name}, Url at {self.url} >>)'
+        return f'Stand(<< Name <str> {self.name}, Url <str> {self.url} >>)'
 
     def validated(self):
         return (
