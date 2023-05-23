@@ -2,22 +2,25 @@
 FOLDER_NAME = './files/'
 
 # <-- Search Values -->
-MAX_PARTS = 9
+MAX_PARTS = 1
 DOMAIN = 'https://jojowiki.com'
 
-months = {
-    'January': 1,
-    'February': 2,
-    'March': 3,
-    'April': 4,
-    'May': 5,
-    'June': 6,
-    'July': 7,
-    'August': 8,
-    'September': 9,
-    'October': 10,
-    'November': 11,
-    'December': 12,
+DEBUG = True
+
+# <-- Scraping Data -->
+MONTHS = {
+    'january': '01',
+    'february': '02',
+    'march': '03',
+    'april': '04',
+    'may': '05',
+    'june': '06',
+    'july': '07',
+    'august': '08',
+    'september': '09',
+    'october': '10',
+    'november': '11',
+    'december': '12',
 }
 
 STATS_REGEX = r'Null|A|B|C|D|E|\∞|\?'

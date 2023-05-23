@@ -1,5 +1,5 @@
 from bs4 import BeautifulSoup
-from constants.constants import months
+from constants.constants import MONTHS
 import datetime
 import re
 
@@ -62,12 +62,11 @@ def get_parts(urls: list) -> list:
 
 
 def get_date(date_str: str) -> datetime.datetime:
-    date_list = re.search(r'\d{1,2}\s\w+\s\d{4}', date_str)\
-        .group().split(' ')
-    date_list[1] = months[date_list[1]]
-    date_list = [int(date) for date in date_list]
-    date_list.reverse()
-    return datetime.datetime(*date_list)
+    # Date Day/Month(str)/year"  (10 May 2023)
+    date_string = re.search(r'\d{1,2}\s[a-zA-Z]+\s\d{4}', date_str).group().lower()
+    date_month = re.search(r'[a-z]+', date_string).group()
+    new_date_string = re.sub(date_month, MONTHS[date_month], date_string)
+    return datetime.datetime.strptime(new_date_string, '%d %m %Y')
 
 
 def get_last_update(date_str: str) -> float:
