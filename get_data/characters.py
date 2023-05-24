@@ -1,4 +1,4 @@
-import re
+from re import sub, search
 from constants.constants import DOMAIN
 from constants.models import Character
 from scrapper import get_scrapper
@@ -31,15 +31,16 @@ def get_character_data(url_search: str) -> Character:
     )
 
     # <-- Create Character Object -->
-    char = Character(**basic_data)
+    char = Character(**basic_data
+                     )
 
     char.url = url_search
 
     # <-- Character Catchphrase -->
     if slogan := soup.select_one('div.cquote'):
-        slogan = re.sub(r'\n', '', slogan.text)
-        slogan = re.search(r'“.*?”', slogan)
-        char.catchphrase = re.sub(r'[“”]', '', slogan.group())
+        slogan = sub(r'\n', '', slogan.text)
+        slogan = search(r'“.*?”', slogan)
+        char.catchphrase = sub(r'[“”]', '', slogan.group())
     else:
         char.catchphrase = None
 

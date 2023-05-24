@@ -1,14 +1,18 @@
 from bs4 import BeautifulSoup
-from constants.constants import MONTHS
-import datetime
-import re
+from re import search
+from constants.utils import get_image_select, get_last_update
 
 
 def get_basic_data(
         soup: BeautifulSoup,
         card: BeautifulSoup
 ) -> dict:
+
     basic_data = dict()
+
+    # <-- Get Last Update
+    date_str = soup.select_one('li#footer-info-lastmod').string
+    basic_data['last_update'] = get_last_update(date_str)
 
     # <-- Object Name -->
     basic_data['name'] = card.select_one('[data-source="title"]').string
@@ -39,36 +43,18 @@ def get_basic_data(
         basic_data['images']['half_body'] = images_half.attrs['src']
 
     # <-- Full Body -->
-    if images_full := soup.select('div.tbox img'):
-        basic_data['images']['full_body'] = images_full[-1].attrs['src']
-    elif images_full := soup.select_one('.mw-header + div.floatleft img'):
-        basic_data['images']['full_body'] = images_full.attrs['src']
+    if images_full := soup.select('div.floatleft img'):
+        image_select = get_image_select(len(images_full))
+        basic_data['images']['full_body'] = images_full[image_select].attrs['src']
     else:
         basic_data['images']['full_body'] = None
-
-    # <-- Get Last Update
-    date_str = soup.select_one('li#footer-info-lastmod').string
-    basic_data['last_update'] = get_last_update(date_str)
 
     return basic_data
 
 
 def get_parts(urls: list) -> list:
     return [
-        int(re.search(r'\d', url).group())
+        int(search(r'\d', url).group())
         for url in urls
-        if re.search(r'/Category:Part_\d.(Stands|Characters)', url)
+        if search(r'/Category:Part_\d.(Stands|Characters)', url)
     ]
-
-
-def get_date(date_str: str) -> datetime.datetime:
-    # Date Day/Month(str)/year"  (10 May 2023)
-    date_string = re.search(r'\d{1,2}\s[a-zA-Z]+\s\d{4}', date_str).group().lower()
-    date_month = re.search(r'[a-z]+', date_string).group()
-    new_date_string = re.sub(date_month, MONTHS[date_month], date_string)
-    return datetime.datetime.strptime(new_date_string, '%d %m %Y')
-
-
-def get_last_update(date_str: str) -> float:
-    last_date = get_date(date_str)
-    return last_date.timestamp()
